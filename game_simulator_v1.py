@@ -24,7 +24,7 @@ class Character:
         self.weapon = weapon
 
     def attack(self, target: "Character") -> None:
-        """Attack and deal damage to target character"""
+        """Angriper en annen figur med våpenet eller figurens vanlige skade."""
         if self.weapon is not None:
             damage = self.weapon.roll_damage()
         else:
@@ -32,19 +32,20 @@ class Character:
         target.take_damage(damage)
         
     def take_damage(self, amount: int) -> None:
-        """Recognises damage that has ben taken from opponent"""
+        """Reduserer figurens helse uten at den kan bli lavere enn null."""
         self._hp = max(self._hp - amount, 0)
     
     def heal(self, amount: int) -> None:
+        """Øker figurens helse, men aldri over maksimal helse."""
         self._hp = min(self._hp + amount, self.hp_max)
         
     @property
     def is_alive(self) -> bool:
-        """Returns if hp is above 0"""
+        """Returnerer True hvis figuren fortsatt har helse igjen."""
         return self._hp > 0
     
     def introduce(self) -> None:
-        """Creates string that introduces character"""
+        """Skriver ut en kort introduksjon av figuren."""
         print(f"Hi, my name is {self.name}!")
 
     def __repr__(self) -> str:
@@ -61,22 +62,29 @@ class Character:
         return self._hp
     
 class Warrior(Character):
+    """En figurtype som reduserer skade med rustning."""
+
     def __int__(self, name: str, hp_max: int = 100, damage: int = 10, weapon: Weapon | None = None, armor: int = 5) -> None:
+        """Setter opp krigeren med standardverdier og en rustningsverdi."""
         super().__init__(name, hp_max, damage, weapon)
         self.armor = armor
     
     def take_damage(self, amount: int) -> None:
+        """Trekker rustningen fra innkommende skade før helsen reduseres."""
         reduced = max(amount - self.armor, 0)
         super().take_damage(reduced)
 
 class Mage(Character):
+    """En figurtype som bruker mana til å utføre sterkere angrep."""
+
     def __int__(self, name:str, hp_max: int = 100, damage: int = 10, weapon: Weapon | None = None, mana: int = 30, mana_max: int = 30) -> None:
-        
+        """Setter opp magikeren med helse, skade og mana."""
         super().__init__(name, hp_max, damage, weapon)
         self.mana = mana
         self.mana_max = mana_max
         
     def attack(self, target: Character) -> None:
+        """Bruker 10 mana for dobbelt skade, eller et vanlig angrep uten nok mana."""
         if self.mana >= 10:
             self.mana -= 10
             target.take_damage(self.damage*2)
